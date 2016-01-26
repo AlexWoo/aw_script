@@ -99,9 +99,10 @@ def recordprocesses():
         p = process(pid)
         if p is None:
             print pid, "is Dead"
-            del processt[pid]
+            processt[pid]["state"] = "Dead"
         else:
             processn[pid] = p
+
 
 def cpuspent(name):
     spent = {}
@@ -112,10 +113,13 @@ def cpuspent(name):
     return spent
 
 def processspent(name):
-    spent = cpuspent("cpu")
-    puser = float(processn[name]["user"]-processt[name]["user"])*100/spent["total"]
-    psys = float(processn[name]["sys"]-processt[name]["sys"])*100/spent["total"]
-    print "%16s(%5s)[%s]: %.6f  %.6f" % (processn[name]["name"], processn[name]["pid"], processn[name]["state"], puser, psys)
+    if processn[name]["state"] == "Dead":
+        print "%16s(%5s)[%s]: is Dead" % (processn[name]["name"], processn[name]["pid"], processn[name]["state"])
+    else:
+        spent = cpuspent("cpu")
+        puser = float(processn[name]["user"]-processt[name]["user"])*100/spent["total"]
+        psys = float(processn[name]["sys"]-processt[name]["sys"])*100/spent["total"]
+        print "%16s(%5s)[%s]: %.6f  %.6f" % (processn[name]["name"], processn[name]["pid"], processn[name]["state"], puser, psys)
 
 def monitorsys():
     print "++++++++++++++++++++ sys state +++++++++++++++++++++"
