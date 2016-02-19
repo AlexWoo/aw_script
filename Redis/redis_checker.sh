@@ -2,8 +2,9 @@
 
 REDISCLI=/home/redis/redis/bin/redis-cli
 REDISPORT=16379
+REDISHOST=127.0.0.1
 
-RESULT=`$REDISCLI -p $REDISPORT PING`
+RESULT=`$REDISCLI -p $REDISPORT -h $REDISHOST PING`
 if [ "$RESULT" == 'PONG' ];
 then
     echo $RESULT

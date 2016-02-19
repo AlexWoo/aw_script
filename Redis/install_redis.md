@@ -1,4 +1,4 @@
-# AW Scripts
+# install_redis
 ---
 ## install_redis.sh
 
