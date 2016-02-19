@@ -2,7 +2,7 @@
 ---
 ## Instructions
 
-grep in directory tree
+grep in files under directory and it's sub directory
 
 ## Usage
 

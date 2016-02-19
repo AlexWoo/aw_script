@@ -12,3 +12,4 @@ Read the md file which has the same name with script for detail
 
 	- sysmonitor: monitor system cpu load, process(user define) load and socket link (user define) state
 	- syshttpoptim: HTTP Server kenerl optimization
+	- dtgrep: grep in files under directory and it's sub directory
