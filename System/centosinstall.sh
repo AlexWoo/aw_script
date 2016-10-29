@@ -61,4 +61,5 @@ cd ..
 # for nginx
 yum install -y openssl-devel
 yum install -y pcre-devel
+yum install -y httpd-tools
 
