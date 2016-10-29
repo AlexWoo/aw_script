@@ -13,6 +13,7 @@ yum install -y net-tools
 yum install -y wget
 yum install -y tcpdump
 yum install -y traceroute
+yum install -y nmap
 
 # for compress
 yum install -y bzip2
