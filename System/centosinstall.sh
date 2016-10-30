@@ -32,6 +32,7 @@ yum install -y gperf
 yum install -y perf
 yum install -y systemtap
 yum install -y systemtap-sdt-devel #drace
+yum install -y valgrind
 # flame graph
 git clone https://github.com/brendangregg/FlameGraph.git  /usr/local/flamegraph
 cp flameperf.sh /usr/local/bin/
