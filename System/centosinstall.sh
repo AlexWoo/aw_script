@@ -24,6 +24,7 @@ yum install -y git
 yum install -y svn
 yum install -y man-pages
 yum install -y dos2unix
+yum install -y libuuid-devel
 
 # for debug tools
 yum install -y dstat
@@ -52,13 +53,6 @@ cd ..
 
 # for python
 yum install -y python-devel
-
-# for vim
-yum install -y vim
-git clone https://github.com/AlexWoo/vim.git
-cd vim
-./install
-cd ..
 
 # for nginx
 yum install -y openssl-devel
