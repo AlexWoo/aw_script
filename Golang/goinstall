@@ -1,0 +1,73 @@
+exec=`basename $0`
+
+usage()
+{
+cat << END
+
+usage: $exec [options]
+
+    options:
+        --help                  print this message
+        --prefix=InstallPath    set installation prefix
+
+END
+}
+
+help=no
+
+opt=
+
+for option
+do
+    opt="$opt `echo $option | sed -e \"s/\(--[^=]*=\)\(.* .*\)/\1'\2'/\"`"
+
+    case "$option" in
+        -*=*) value=`echo "$option" | sed -e 's/[-_a-zA-Z0-9]*=//'` ;;
+           *) value=""                                              ;;
+    esac
+
+    case "$option" in
+        --help)         help=yes                                    ;;
+        --prefix=)      InstallPath="!"                             ;;
+        --prefix=*)     InstallPath="$value"                        ;;
+        *)
+            echo "$exec: error: invalid option \"$option\""
+            usage
+            exit 1
+        ;;
+    esac
+done
+
+if [ $help = yes ];then
+    usage
+    exit 0
+fi
+
+case ".$InstallPath" in
+    .)  InstallPath=$HOME/go    ;;
+    .!) InstallPath=$HOME/go    ;;
+    *)                          ;;
+esac
+
+echo $InstallPath
+
+OLDGOPATH="$GOPATH"
+export GOPATH="$InstallPath"
+
+pwd=`pwd`
+location=$InstallPath/src/`basename $pwd`/
+mkdir -p $location
+for file in `ls`
+do
+    cp -rf $file $location
+    echo cp -rf $file $location
+done
+
+cd $location
+# get dependence
+go get
+
+# install
+go install
+
+export GOPATH="$OLDGOPATH"
