@@ -21,8 +21,7 @@ echo /usr/lib > /etc/ld.so.conf.d/janus.conf
 ldconfig
 ln -s /usr/lib/pkgconfig/libsrtp.pc /usr/lib64/pkgconfig/libsrtp.pc
 
-git clone https://github.com/meetecho/janus-gateway.git
-git checkout $Version
+git clone --branch $Version https://github.com/meetecho/janus-gateway.git
 cd janus-gateway
 
 sh autogen.sh
