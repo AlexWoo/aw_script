@@ -78,7 +78,7 @@ genkey()
 }
 
 install_dep
-install_janus
 create_user
+install_janus
 install_service
 genkey
