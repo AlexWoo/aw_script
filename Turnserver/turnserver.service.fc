@@ -1,0 +1,22 @@
+[Unit]
+Description=coturn
+After=syslog.target network.target
+
+[Service]
+User=turnserver
+Group=turnserver
+Type=forking
+EnvironmentFile=/etc/sysconfig/turnserver
+PIDFile=
+ExecStart=/usr/local/bin/turnserver -o $EXTRA_OPTIONS
+ExecStopPost=
+Restart=always
+
+LimitCORE=infinity
+LimitNOFILE=infinity
+LimitRTPRIO=infinity
+LimitRTTIME=infinity
+UMask=0007
+
+[Install]
+WantedBy=multi-user.target
