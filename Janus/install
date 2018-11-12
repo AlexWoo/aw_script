@@ -6,8 +6,8 @@ Version=v0.4.3
 install_dep()
 {
     yum install -y libmicrohttpd-devel jansson-devel libnice-devel openssl-devel \
-        glib-devel opus-devel libogg-devel libcurl-devel libwebsockets-devel \
-        pkgconfig gengetopt libtool autoconf automake
+        glib-devel opus-devel libogg-devel libcurl-devel \
+        pkgconfig gengetopt libtool autoconf automake cmake
 
     # yum install libsrtp, release is 1.4, cannot use
     if [ ! -d libsrtp-2.2.0 ];then
@@ -16,6 +16,16 @@ install_dep()
         cd libsrtp-2.2.0
         ./configure --prefix=/usr --enable-openssl
         make shared_library && sudo make install
+        cd -
+    fi
+
+    # libwebsockets cannot use yum to install
+    if [ ! -d libwebsockets ];then
+        git clone https://github.com/warmcat/libwebsockets.git
+        mkdir build
+        cd build
+        cmake -DLWS_MAX_SMP=1 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" ../libwebsockets
+        make && make install
         cd -
     fi
 
@@ -31,7 +41,7 @@ install_janus()
 
     sh autogen.sh
 
-    ./configure --prefix=$InstallPath
+    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt
     make
     make install
     make configs
