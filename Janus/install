@@ -87,8 +87,14 @@ genkey()
     fi
 }
 
+conf()
+{
+    sed -i "s/^http = yes/http = no/g" $InstallPath/etc/janus/janus.transport.http.cfg
+}
+
 install_dep
 create_user
 install_janus
 install_service
 genkey
+conf
