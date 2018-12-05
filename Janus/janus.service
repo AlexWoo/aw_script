@@ -1,0 +1,21 @@
+[Unit]
+Description=janus
+After=syslog.target network.target
+
+[Service]
+User=janus
+Group=janus
+Type=forking
+PIDFile=
+ExecStart=[InstallPath]/bin/janus -b -d 7 -L [InstallPath]/logs/janus.log -s 60
+ExecStopPost=
+Restart=always
+
+LimitCORE=infinity
+LimitNOFILE=infinity
+LimitRTPRIO=infinity
+LimitRTTIME=infinity
+UMask=0007
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,45 @@
+#! /bin/bash
+
+package=coturn-4.5.0.5.tar.gz
+dir=`basename $package .tar.gz`
+
+centos_release=`cat /etc/redhat-release | awk '{print $4}' |awk -F '.' '{print $1}'`
+if [ "$centos_release" == '7' ];then
+    release='centos7'
+else
+    echo "Only support centos7"
+fi
+
+install_coturn()
+{
+    if [ ! -d $dir ];then
+        echo "tar xzf $package"
+        tar xzf $package
+    fi
+
+    if [ -d $dir ];then
+        echo "install $dir"
+        cd $dir
+        yum install -y libevent-devel
+        ./configure && make && make install
+        cd -
+    fi
+}
+
+service_coturn()
+{
+    grep "^turnserver" /etc/passwd >& /dev/null
+    if [ $? -ne 0 ];then
+        useradd turnserver -M -r -s /sbin/nologin
+    fi
+
+    cp -f turnserver.sysconfig /etc/sysconfig/turnserver
+    mkdir -p /var/run/turnserver
+    chown -R turnserver:turnserver /var/run/turnserver
+
+    echo "cp turnserver.service.fc /lib/systemd/system/turnserver.service"
+    cp turnserver.service.fc /lib/systemd/system/turnserver.service
+}
+
+install_coturn
+service_coturn

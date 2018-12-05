@@ -3,43 +3,98 @@
 InstallPath=/usr/local/janus
 Version=v0.4.3
 
-yum install -y libmicrohttpd-devel jansson-devel libnice-devel openssl-devel \
-    glib-devel opus-devel libogg-devel libcurl-devel libwebsockets-devel \
-    pkgconfig gengetopt libtool autoconf automake
+install_dep()
+{
+    yum install -y libmicrohttpd-devel jansson-devel libnice-devel openssl-devel \
+        glib-devel opus-devel libogg-devel libcurl-devel \
+        pkgconfig gengetopt libtool autoconf automake cmake
 
-# yum install libsrtp, release is 1.4, cannot use
-if [ ! -d libsrtp-2.2.0 ];then
-    wget https://github.com/cisco/libsrtp/archive/v2.2.0.tar.gz
-    tar xfv v2.2.0.tar.gz
-    cd libsrtp-2.2.0
-    ./configure --prefix=/usr --enable-openssl
-    make shared_library && sudo make install
+    # yum install libsrtp, release is 1.4, cannot use
+    if [ ! -d libsrtp-2.2.0 ];then
+        wget https://github.com/cisco/libsrtp/archive/v2.2.0.tar.gz
+        tar xfv v2.2.0.tar.gz
+        cd libsrtp-2.2.0
+        ./configure --prefix=/usr --enable-openssl
+        make shared_library && sudo make install
+        cd -
+    fi
+
+    # libwebsockets cannot use yum to install
+    if [ ! -d libwebsockets ];then
+        git clone https://github.com/warmcat/libwebsockets.git
+        mkdir build
+        cd build
+        cmake -DLWS_MAX_SMP=1 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" ../libwebsockets
+        make && make install
+        cd -
+    fi
+
+    echo /usr/lib > /etc/ld.so.conf.d/janus.conf
+    ldconfig
+    ln -s /usr/lib/pkgconfig/libsrtp.pc /usr/lib64/pkgconfig/libsrtp.pc
+}
+
+install_janus()
+{
+    git clone --branch $Version https://github.com/meetecho/janus-gateway.git
+    cd janus-gateway
+
+    sh autogen.sh
+
+    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt
+    make
+    make install
+    make configs
+
+    mkdir -p $InstallPath/logs
+    chown -R janus:janus $InstallPath
+
     cd -
-fi
+}
 
-echo /usr/lib > /etc/ld.so.conf.d/janus.conf
-ldconfig
-ln -s /usr/lib/pkgconfig/libsrtp.pc /usr/lib64/pkgconfig/libsrtp.pc
+create_user()
+{
+    grep "^janus" /etc/passwd >& /dev/null
+    if [ $? -ne 0 ];then
+        useradd janus -M -r -s /sbin/nologin
+    fi
+}
 
-git clone --branch $Version https://github.com/meetecho/janus-gateway.git
-cd janus-gateway
+install_service()
+{
+    release=`cat /etc/redhat-release | awk '{print $4}' |awk -F '.' '{print $1}'`
+    if [ "$release" == '7' ];then
+        sed "s#\[InstallPath\]#$InstallPath#g" janus.service > /lib/systemd/system/janus.service
+    else
+        echo "Only support CentOS7"
+        exit 1
+    fi
+}
 
-sh autogen.sh
+genkey()
+{
+    if [ ! -d $InstallPath/certs ];then
+        mkdir -p $InstallPath/certs
+        openssl req \
+            -new \
+            -newkey rsa:4096 \
+            -days 365 \
+            -nodes \
+            -x509 \
+            -subj "/C=AU/ST=NSW/L=Sydney/O=JanusDemo/CN=rtc.test.com" \
+            -keyout $InstallPath/certs/mycert.key \
+            -out $InstallPath/certs/mycert.pem
+    fi
+}
 
-./configure --prefix=$InstallPath
-make
-make install
-make configs
+conf()
+{
+    sed -i "s/^http = yes/http = no/g" $InstallPath/etc/janus/janus.transport.http.cfg
+}
 
-if [ ! -d $InstallPath/certs ];then
-    mkdir -p $InstallPath/certs
-    openssl req \
-        -new \
-        -newkey rsa:4096 \
-        -days 365 \
-        -nodes \
-        -x509 \
-        -subj "/C=AU/ST=NSW/L=Sydney/O=JanusDemo/CN=rtc.test.com" \
-        -keyout $InstallPath/certs/mycert.key \
-        -out $InstallPath/certs/mycert.pem
-fi
+install_dep
+create_user
+install_janus
+install_service
+genkey
+conf
