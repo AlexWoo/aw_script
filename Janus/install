@@ -1,7 +1,7 @@
 #!/bin/bash
 
 InstallPath=/usr/local/janus
-Version=v0.4.3
+Version=1.0.0
 
 install_dep()
 {
@@ -36,7 +36,7 @@ install_dep()
 
 install_janus()
 {
-    git clone --branch $Version https://github.com/meetecho/janus-gateway.git
+    git clone --branch $Version https://github.com/AlexWoo/janus-gateway.git
     cd janus-gateway
 
     sh autogen.sh
