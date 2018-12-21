@@ -32,4 +32,6 @@ RUN sed -i "s/^http = yes/http = no/g" /usr/local/janus/etc/janus/janus.transpor
 RUN mkdir -p /usr/local/janus/certs
 RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=AU/ST=NSW/L=Sydney/O=JanusDemo/CN=rtc.test.com" -keyout /usr/local/janus/certs/mycert.key -out /usr/local/janus/certs/mycert.pem
 
+RUN rm -rf *
+
 CMD /usr/local/janus/bin/janus -L /usr/local/janus/logs/janus.log -s 60
