@@ -7,7 +7,7 @@ User=janus
 Group=janus
 Type=forking
 PIDFile=
-ExecStart=[InstallPath]/bin/janus -b -d 7 -L [InstallPath]/logs/janus.log -s 60
+ExecStart=[InstallPath]/bin/janus -b -L [InstallPath]/logs/janus.log -s 60
 ExecStopPost=
 Restart=always
 
