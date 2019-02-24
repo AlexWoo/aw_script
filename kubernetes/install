@@ -1,0 +1,9 @@
+#!/bin/bash
+
+systemctl disable firewalld
+systemctl stop firewalld
+yum install -y docker
+yum install -y etcd kubernetes
+
+systemctl enable docker
+systemctl start docker
