@@ -41,7 +41,7 @@ install_janus()
 
     sh autogen.sh
 
-    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt
+    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt --enable-post-processing
     make
     make install
     make configs
