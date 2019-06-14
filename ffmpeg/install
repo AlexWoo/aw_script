@@ -1,0 +1,185 @@
+#!/bin/bash
+
+InstallPath=/root/ffmpeg
+echo "InstallPath:"$InstallPath
+
+Version=dev
+
+install_dep()
+{
+     yum install -y autoconf automake bzip2 bzip2-devel cmake freetype-devel \
+        gcc gcc-c++ git libtool make mercurial pkgconfig zlib-devel libvpx*
+
+    # NASM: An assembler used by some libraries. Highly recommended or your resulting build may be very slow.
+    if [ ! -d nasm-2.14.02 ];then
+        if [ ! -f nasm-2.14.02.tar.bz2 ];then
+            curl -O -L https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        fi
+
+        tar xjvf nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02
+        ./autogen.sh
+        ./configure --prefix="$InstallPath/ffmpeg_build" --bindir="$InstallPath/bin"
+        make
+        make install
+        cd -
+    fi
+
+    # Yasm: An assembler used by some libraries. Highly recommended or your resulting build may be very slow.
+    if [ ! -d yasm-1.3.0 ];then
+        if [ ! -f yasm-1.3.0.tar.gz ];then
+            curl -O -L https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+        fi
+
+        tar xzvf yasm-1.3.0.tar.gz
+        cd yasm-1.3.0
+        ./configure --prefix="$InstallPath/ffmpeg_build" --bindir="$InstallPath/bin"
+        make
+        make install
+        cd -
+    fi
+
+    # libx264:H.264 video encoder. See the H.264 Encoding Guide for more information and usage examples.
+    # Requires ffmpeg to be configured with --enable-gpl --enable-libx264.
+    if [ ! -d x264 ];then
+        if [ ! -f x264.tar.gz ];then
+            git clone --depth 1 https://code.videolan.org/videolan/x264.git
+            tar cvfz x264.tar.gz x264/
+        else
+            tar xzvf x264.tar.gz
+        fi 
+
+        cd x264
+        PKG_CONFIG_PATH="$InstallPath/ffmpeg_build/lib/pkgconfig" 
+        ./configure --prefix="$InstallPath/ffmpeg_build" --bindir="$InstallPath/bin" --enable-static
+        make
+        make install
+        cd -
+    fi
+
+    # libx265: H.265/HEVC video encoder. See the H.265 Encoding Guide for more information and usage examples.
+    # Requires ffmpeg to be configured with --enable-gpl --enable-libx265.
+    if [ ! -d x265 ];then
+        if [ ! -f x265.tar.gz ];then
+            hg clone https://bitbucket.org/multicoreware/x265
+            tar cvfz x265.tar.gz x265/
+        else
+            tar xzvf x265.tar.gz
+        fi 
+
+        cd x265/build/linux
+        cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$InstallPath/ffmpeg_build" -DENABLE_SHARED:bool=off ../../source
+        make
+        make install
+        cd $InstallPath
+    fi
+
+    # libfdk_aac: AAC audio encoder. See the AAC Audio Encoding Guide for more information and usage examples.
+    # Requires ffmpeg to be configured with --enable-libfdk_aac (and --enable-nonfree if you also included --enable-gpl).
+    if [ ! -d fdk-aac ];then
+        if [ ! -f fdk-aac.tar.gz ];then
+            git clone --depth 1 https://github.com/mstorsjo/fdk-aac
+            tar cvfz fdk-aac.tar.gz fdk-aac/
+        else
+            tar xzvf fdk-aac.tar.gz
+        fi 
+
+        cd fdk-aac
+        autoreconf -fiv
+        ./configure --prefix="$InstallPath/ffmpeg_build" --disable-shared
+        make
+        make install
+        cd -
+    fi
+
+    # libmp3lame:MP3 audio encoder.
+    # Requires ffmpeg to be configured with --enable-libmp3lame.
+    if [ ! -d lame-3.100 ];then
+        if [ ! -f lame-3.100.tar.gz ];then
+            curl -O -L https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+        fi
+
+        tar xzvf lame-3.100.tar.gz
+        cd lame-3.100
+        ./configure --prefix="$InstallPath/ffmpeg_build" --bindir="$InstallPath/bin" --disable-shared --enable-nasm
+        make
+        make install
+        cd -
+    fi
+
+    # libopus:Opus audio decoder and encoder.
+    # Requires ffmpeg to be configured with --enable-libopus.
+    if [ ! -d opus-1.3.1 ];then
+        if [ ! -f opus-1.3.1.tar.gz ];then
+            curl -O -L https://archive.mozilla.org/pub/opus/opus-1.3.1.tar.gz
+        fi
+
+        tar xzvf opus-1.3.1.tar.gz
+        cd opus-1.3.1
+        ./configure --prefix="$InstallPath/ffmpeg_build" --disable-shared
+        make
+        make install
+        cd -
+    fi
+
+    if [ ! -d libvpx-1.4.0 ];then
+        if [ ! -f libvpx-1.4.0.tar.bz2 ];then
+            curl -O -L http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-1.4.0.tar.bz2
+        fi
+
+        tar xjvf libvpx-1.4.0.tar.bz2
+        cd libvpx-1.4.0
+        sed   -e 's/cp -p/cp/' -i build/make/Makefile 
+        chmod -v 644 vpx/*.h
+
+        mkdir ../libvpx-build
+        cd    ../libvpx-build
+
+        ../libvpx-1.4.0/configure --prefix=/usr \
+            --enable-shared \
+            --disable-static
+        make
+        make install
+        cd -
+    fi
+}
+
+install_ffmpeg()
+{
+    if [ ! -d ffmpeg-4.1.3 ];then
+        if [ ! -f ffmpeg-4.1.3.tar ];then
+            exit 1
+        fi
+        tar xfv ffmpeg-4.1.3.tar
+    fi
+
+    cd ffmpeg-4.1.3
+
+    PATH="$InstallPath/bin:$PATH" 
+    PKG_CONFIG_PATH="$InstallPath/ffmpeg_build/lib/pkgconfig" 
+    PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/pkgconfig:/usr/lib64/pkgconfig
+    export PKG_CONFIG_PATH
+    
+    ./configure --prefix="$InstallPath/ffmpeg_build" \
+      --pkg-config-flags="--static" \
+      --extra-cflags="-I$InstallPath/ffmpeg_build/include" \
+      --extra-ldflags="-L$InstallPath/ffmpeg_build/lib" \
+      --extra-libs=-lpthread \
+      --extra-libs=-lm \
+      --bindir="$InstallPath/bin" \
+      --enable-gpl \
+      --enable-libfdk_aac \
+      --enable-libfreetype \
+      --enable-libmp3lame \
+      --enable-libopus \
+      --enable-libvpx \
+      --enable-libx264 \
+      --enable-libx265 \
+      --enable-nonfree
+    make
+    make install
+    cd -
+}
+
+install_dep
+install_ffmpeg
