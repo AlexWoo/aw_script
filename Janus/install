@@ -47,6 +47,7 @@ install_janus()
     make configs
 
     mkdir -p $InstallPath/logs
+    cp ../compress.sh $InstallPath/bin
     chown -R janus:janus $InstallPath
 
     cd -
