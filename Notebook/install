@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker build -t alexwoo/notebook ./
+cp -f notebook /usr/local/bin/
