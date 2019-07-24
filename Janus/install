@@ -41,12 +41,14 @@ install_janus()
 
     sh autogen.sh
 
-    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt
+    ./configure --prefix=$InstallPath --disable-rabbitmq --disable-mqtt --enable-post-processing
     make
     make install
     make configs
 
     mkdir -p $InstallPath/logs
+    chmod +x ../compress.sh
+    cp ../compress.sh $InstallPath/bin
     chown -R janus:janus $InstallPath
 
     cd -
