@@ -1,0 +1,4 @@
+#!/bin/bash
+
+localwork=~/Github/
+docker run --rm -v $localwork:/root/work/ -p 22:22 alexwoo/centos-dev

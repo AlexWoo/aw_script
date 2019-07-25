@@ -1,0 +1,47 @@
+#!/bin/bash
+
+curl -L  http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/Centos-Base.repo
+
+yum install -y epel-release
+yum install -y net-tools wget tcpdump traceroute bzip2 zip unzip man-pages
+yum install -y gdb gcc gcc-c++ make dstat strace ltrace lsof perf valgrind
+yum install -y libpcap libpcap-devel ncurses ncurses-devel flex texinfo help2man readline-devel
+yum install -y golang
+yum install -y openssl-devel pcre-devel
+
+# download and install cgdb
+wget https://cgdb.me/files/cgdb-0.6.8.tar.gz
+tar xzf cgdb-0.6.8.tar.gz
+cd cgdb-0.6.8
+./configure --prefix=/usr/local
+make && make install
+cd -
+rm -rf cgdb*
+
+# download and install flamegraph
+git clone https://github.com/brendangregg/FlameGraph.git  /usr/local/flamegraph
+mv flameperf.sh /usr/local/bin/
+
+# download and install nload
+wget http://www.roland-riegel.de/nload/nload-0.7.4.tar.gz
+tar zxf nload-0.7.4.tar.gz
+cd nload-0.7.4
+./configure
+make && make install
+cd -
+rm -rf nload*
+
+# download and install iftop
+wget http://www.ex-parrot.com/pdw/iftop/download/iftop-1.0pre4.tar.gz
+tar xzf iftop-1.0pre4.tar.gz
+cd iftop-1.0pre4
+./configure && make && make install
+cd -
+
+rm -rf iftop*
+
+# install openssh
+yum install -y openssh-server
+ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
+ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key
+ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key
