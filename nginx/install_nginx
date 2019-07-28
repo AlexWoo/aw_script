@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# download package
+wget http://nginx.org/download/nginx-1.16.0.tar.gz
+tar xzf nginx-1.16.0.tar.gz
+git clone https://github.com/openresty/echo-nginx-module.git
+git clone https://github.com/openresty/headers-more-nginx-module.git
+
+# install
+cd nginx-1.16.0
+./configure --with-debug --add-module=../echo-nginx-module --add-module=../headers-more-nginx-module
+make && make install
