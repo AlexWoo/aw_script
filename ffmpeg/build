@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker build -t alexwoo/ffmpeg ./
+cp -f ffmpegdev /usr/local/bin/

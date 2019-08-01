@@ -1,0 +1,85 @@
+#!/bin/bash
+
+yum install -y cmake autoconf automake bzip2 bzip2-devel cmake freetype-devel \
+        gcc gcc-c++ git libtool make mercurial pkgconfig zlib-devel which
+
+# NASM
+tar xjf nasm-2.14.02.tar.bz2
+cd nasm-2.14.02
+./autogen.sh
+./configure --prefix=/usr/local
+make && make install
+cd -
+
+# YASM
+tar xzvf yasm-1.3.0.tar.gz
+cd yasm-1.3.0
+./configure --prefix=/usr/local
+make && make install
+cd -
+
+# libx264
+tar xzf x264.tar.gz
+cd x264
+./configure --prefix=/usr/local --enable-static
+make && make install
+cd -
+
+# libx265
+tar xzf x265.tar.gz
+cd x265/build/linux
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_SHARED:bool=off ../../source
+make && make install
+cd -
+
+# libfdk_aac
+tar xzf fdk-aac.tar.gz
+cd fdk-aac
+autoreconf -fiv
+./configure --prefix=/usr/local --disable-shared
+make && make install
+cd -
+
+# libmp3lame
+tar xzf lame-3.100.tar.gz
+cd lame-3.100
+./configure --prefix=/usr/local --disable-shared --enable-nasm
+make && make install
+cd -
+
+# libopus
+tar xzf opus-1.3.1.tar.gz
+cd opus-1.3.1
+./configure --prefix=/usr/local --disable-shared
+make && make install
+cd -
+
+# libvpx
+tar xjf libvpx-1.4.0.tar.bz2
+cd libvpx-1.4.0
+./configure --prefix=/usr/local --disable-shared --enable-static
+make && make install
+cd -
+
+# ffmpeg
+tar xf ffmpeg-4.1.3.tar
+cd ffmpeg-4.1.3
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+./configure --prefix=/usr/local \
+    --pkg-config-flags="--static" \
+    --extra-libs=-lpthread \
+    --extra-libs=-lm \
+    --enable-gpl \
+    --enable-libfdk_aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libvpx \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-nonfree \
+    --enable-debug \
+    --extra-cflags=-g \
+    --extra-ldflags=-g
+make && make install
+cd -
