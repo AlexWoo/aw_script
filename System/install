@@ -1,5 +1,6 @@
 #!/bin/bash
 
-cat ~/.ssh/id_rsa.pub
 docker build -t alexwoo/centos-dev ./
-cp -f centosdev /usr/local/bin/
+cp -f centos /usr/local/bin/
+cp -f ceit /usr/local/bin/
+cp -f cstop /usr/local/bin/

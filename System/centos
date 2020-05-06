@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$WORKDIR" == "" ];then
+    WORKDIR=~/
+fi
+
+docker run --rm -d -v $WORKDIR:/root/work/ --name centos alexwoo/centos-dev

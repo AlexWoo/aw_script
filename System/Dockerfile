@@ -3,11 +3,10 @@ MAINTAINER AlexWoo <wj19840501@gmail.com>
 WORKDIR /root
 COPY docker_centos_dev .
 COPY flameperf.sh .
-COPY authorized_keys ./.ssh/
 
 RUN ./docker_centos_dev
 RUN mkdir work
 
 VOLUME work
 
-CMD /usr/sbin/sshd -D
+CMD init

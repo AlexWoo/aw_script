@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$WORKDIR" == "" ];then
+    WORKDIR=~/
+fi
+
+docker exec -it centos /bin/bash
