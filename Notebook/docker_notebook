@@ -1,0 +1,26 @@
+#!/bin/bash
+
+yum install java
+
+# install notebook ipython numpy pandas matplotlib scipy scikit-learn
+pip install --upgrade -v pip -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install notebook ipython numpy pandas matplotlib scipy scikit-learn patsy scipy statsmodels tensorflow seaborn -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install jieba spectral hmmlearn pillow pyamg -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install hmm -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install geopandas descartes mapclassify -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install beautifulsoup4 -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install torch torchvision -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install torchtext -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install gensim -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install xgboost lightgbm -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install thompson-sampling -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install tensorboard -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install tensorflow-io -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+pip install PySpark -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+
+ln -s /usr/local/python3/bin/jupyter /usr/bin/jupyter
+
+# configured jupyter notebook
+useradd notebook
+
+rm -f docker_notebook
