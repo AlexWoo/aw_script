@@ -8,6 +8,7 @@ yum install -y gdb gcc gcc-c++ make dstat strace ltrace lsof perf valgrind
 yum install -y libpcap libpcap-devel ncurses ncurses-devel flex texinfo help2man readline-devel
 yum install -y golang
 yum install -y openssl-devel pcre-devel
+yum -y install zlib-devel bzip2-devel sqlite-devel tk-devel libffi-devel
 
 # download and install cgdb
 wget https://cgdb.me/files/cgdb-0.6.8.tar.gz
@@ -39,3 +40,19 @@ cd iftop-1.0pre4
 cd -
 
 rm -rf iftop*
+
+# install python3 instead of python2
+wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
+tar xzf Python-3.7.1.tgz
+cd Python-3.7.1
+./configure prefix=/usr/local/python3 && make && make install
+rm -f /usr/bin/python
+ln -s /usr/local/python3/bin/python3 /usr/bin/python
+ln -s /usr/local/python3/bin/pip3  /usr/bin/pip
+sed -i "s/^#\!.*/#\!\/usr\/bin\/python2/g" /usr/bin/yum
+sed -i "s/^#\!.*/#\!\/usr\/bin\/python2/g" /usr/libexec/urlgrabber-ext-down
+cd -
+
+rm -rf Python*
+
+rm -f docker_centos_dev

@@ -1,4 +1,4 @@
-FROM centos
+FROM centos:7
 MAINTAINER AlexWoo <wj19840501@gmail.com>
 WORKDIR /root
 COPY docker_centos_dev .
